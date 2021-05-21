@@ -32,7 +32,13 @@ class _HomeState extends State<Home> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text("$textoSalvarAtualizar anotação"),
+          title: Text(
+            "$textoSalvarAtualizar anotação",
+            style: TextStyle(
+              color: Colors.green,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
@@ -118,6 +124,47 @@ class _HomeState extends State<Home> {
     return dataFormatada;
   }
 
+  _removerAnotacao(int id) async {
+    await _db.removerAnotacao(id);
+
+    _recuperarAnotacoes();
+  }
+
+  _exibirTelaExclusao({Anotacao anotacao}) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(
+            "Aviso!",
+            style: TextStyle(
+              color: Colors.red,
+            ),
+          ),
+          content: Text(
+            "Deseja remover: " + anotacao.titulo.toString() + " ?",
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          actions: <Widget>[
+            FlatButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text("Cancelar"),
+            ),
+            FlatButton(
+              onPressed: () {
+                _removerAnotacao(anotacao.id);
+                Navigator.pop(context);
+              },
+              child: Text("Confirmar"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -141,7 +188,11 @@ class _HomeState extends State<Home> {
 
                 return Card(
                   child: ListTile(
-                    title: Text(anotacao.titulo),
+                    title: Text(
+                      anotacao.titulo,
+                      style: TextStyle(
+                          color: Colors.blue, fontWeight: FontWeight.bold),
+                    ),
                     subtitle: Text(
                         "${_formatarData(anotacao.data)} - ${anotacao.descricao}"),
                     trailing: Row(
@@ -160,7 +211,9 @@ class _HomeState extends State<Home> {
                           ),
                         ),
                         GestureDetector(
-                          onTap: () {},
+                          onTap: () {
+                            _exibirTelaExclusao(anotacao: anotacao);
+                          },
                           child: Padding(
                             padding: EdgeInsets.only(right: 0),
                             child: Icon(
